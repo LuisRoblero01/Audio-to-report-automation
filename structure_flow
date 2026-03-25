@@ -1,0 +1,20 @@
+El flujo de la automatización es la siguiente:
+1. Un bot en Telegram recibe un archivo de audio.
+2. Se hace una estimación del precio en base a la duración del archivo de audio (medido en minutos).
+3. Una vez confirmado el pago y el crédito disponible, se comienza a procesar el audio dado.
+4. Se utiliza la API de ChatGPT para convertir el audio a texto.
+5. Se utiliza la API de ChatGPT para ordenar el texto a un formato de salida deseado por el usuario.
+6. Se regresa el archivo en PDF o Word con la información analizada.
+
+Funciones de la automatización:
+1. Se usa un sistema de pago por minutos en forma de créditos, de la forma:
+
+         60 minutos -> $29 pesos
+        120 minutos -> $59 pesos
+        180 minutos -> $79 pesos
+
+2. Se usa MercadoPago como método de pago.
+3. Se presentan opciones de 'estilo' del audio que el usuario da, asi como el 'estilo' de diseño de sal
+4. Se usan formatos preestablecidos en formato HTML o CSS para ahorrar en tokens de API.
+
+    
