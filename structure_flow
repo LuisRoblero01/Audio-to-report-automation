@@ -17,4 +17,15 @@ Funciones de la automatización:
 3. Se presentan opciones de 'estilo' del audio que el usuario da, asi como el 'estilo' de diseño de sal
 4. Se usan formatos preestablecidos en formato HTML o CSS para ahorrar en tokens de API.
 
+Flujo de la carga de trabajo:
+1. Se analiza el peso y duracion del archivo de audio que manden al bot.
+2. Se porpone no usar límites de duracion como diferenciador a la competencia gratis.
+3. Se propone usar un sistema de condicionantes en cuanto al funcionamiento del algoritmo que analizará el audio:
+
+         duración < 20 minutos                   -> Pasa directo
+         90 minutos > duración > 20 minutos      -> Chunking
+         duración > 90 minutos                   -> Procesado especial
+
+4. Se proponen mensajes 'positivos' para el usuario, evitando negativismos.
+5. 
     
