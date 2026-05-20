@@ -1,71 +1,71 @@
-# Arquitectura del sistema
+# System Architecture
 
-## Propósito
+## Overview
 
-Brudi Notas es una automatización diseñada para convertir audios enviados por Telegram en documentos útiles, estructurados y presentables. El objetivo es transformar notas de voz, clases, juntas o grabaciones largas en salidas como transcripciones limpias, resúmenes, minutas o reportes en formato PDF o Word.
+The system is built as a modular automation pipeline orchestrated through n8n workflows, connected to a PostgreSQL database for state management and user data.
 
-El sistema busca ofrecer una experiencia sencilla para el usuario final: enviar un audio, conocer el costo según su duración, completar el pago y recibir un documento final bien organizado.
+## Architecture Diagram (Functional)
 
-## Flujo general del usuario
+```
+[Telegram User]
+      |
+[Telegram Bot API]
+      |
+[Message Router] -----> [Command Handler]
+      |                     |--- /start -> Welcome menu
+      |                     |--- /perfil -> Balance & stats
+      |                     L--- /credits -> Purchase flow
+      |
+[Audio Processor]
+      |--- Metadata extraction
+      |--- Duration estimation
+      |--- Credit validation
+      L--- Cost calculation
+            |
+[Transcription Module] -----> AI Speech-to-Text API
+            |
+[Formatting Engine]
+      |--- Quick summary
+      |--- Detailed notes
+      |--- Meeting minutes
+      |--- Conference analysis
+      |--- Study notes
+      L--- Custom formats (user-defined templates)
+            |
+[Document Generator] -----> PDF / Word output
+            |
+[Delivery Module] -----> Telegram file upload
+```
 
-1. El usuario envía un archivo de audio al bot de Telegram.
-2. El sistema detecta la duración del archivo y estima el costo del servicio.
-3. El usuario realiza la compra de créditos o utiliza los disponibles.
-4. Una vez confirmado el pago, se inicia el procesamiento del audio.
-5. El audio se convierte a texto usando la API de ChatGPT.
-6. El texto obtenido se reorganiza según el formato de salida deseado por el usuario.
-7. Se genera un documento final en PDF o Word.
-8. El archivo final se entrega al usuario a través de Telegram.
+## Data Flow
 
-## Arquitectura funcional
+1. **Ingestion Layer** — Receives and validates incoming messages via Telegram webhook
+2. **User Context Layer** — Manages user profiles, credit balances, and preferences
+3. **Processing Pipeline** — Orchestrates transcription, formatting, and document generation
+4. **Payment Integration** — Handles credit purchases through external payment gateway
+5. **Storage Layer** — PostgreSQL for users, transactions, audio metadata, and documents
+6. **Observability** — Langfuse for tracing and performance monitoring
 
-La automatización se organiza en los siguientes módulos:
+## Key Design Decisions
 
-### 1. Módulo de entrada
-Recibe el archivo enviado por el usuario y obtiene metadatos relevantes como nombre, formato, peso y duración.
+- **Event-driven:** Each processing stage triggers the next upon completion
+- **Stateful:** User sessions and credit balances persist across interactions
+- **Modular:** Each functional module is independent and replaceable
+- **Template-based:** Document outputs use configurable templates to reduce API costs
+- **Chunked processing:** Long audio files are split into manageable segments
 
-### 2. Módulo de cotización
-Calcula el precio estimado con base en la duración del audio y la lógica de créditos definida en el sistema.
+## External Integrations
 
-### 3. Módulo de validación de pago
-Verifica si el usuario cuenta con créditos suficientes o si debe completar un pago mediante Mercado Pago, integrando la API dentro de la automatización.
+- **Telegram Bot API** — User interface and file transfer
+- **AI APIs** — Speech-to-text and text structuring
+- **Payment API** — Credit purchase processing
+- **Langfuse** — Observability and tracing
 
-### 4. Módulo de transcripción
-Envía el audio a la API de ChatGPT para convertirlo en texto.
+## Database Schema (Simplified)
 
-### 5. Módulo de estructuración
-Se usa la APÏ de ChatGPT para reorganizar la transcripción en el formato solicitado por el usuario, como resumen, minuta, notas o reporte.
-
-### 6. Módulo de generación de documento
-Inserta el contenido procesado dentro de una plantilla predefinida y genera el archivo final en PDF o Word.
-
-### 7. Módulo de entrega
-Devuelve el archivo final directamente al usuario mediante Telegram.
-
-## Lógica de negocio
-
-El modelo de cobro se basa en créditos medidos en minutos de audio procesable.
-
-### Paquetes propuestos
-- 60 minutos por $29 MXN
-- 120 minutos por $59 MXN
-- 180 minutos por $79 MXN
-- 300 minutos por $129 MXN
-
-Antes de iniciar el procesamiento, el sistema valida que el usuario tenga saldo suficiente o que el pago del paquete de créditos haya sido confirmado correctamente.
-
-## Estrategia de procesamiento de audio
-
-Para manejar distintos tipos de carga de trabajo, se proponen varias rutas de procesamiento:
-
-- Duración menor a 20 minutos: procesamiento directo.
-- Duración entre 20 y 90 minutos: procesamiento por fragmentos.
-- Duración mayor a 90 minutos: procesamiento especial.
-
-Esta estrategia busca optimizar costos, estabilidad y experiencia de uso, evitando imponer límites estrictos como diferenciador del servicio.
-
-## Consideraciones de experiencia de usuario
-
-El sistema busca mantener mensajes positivos y claros durante todo el proceso, evitando respuestas innecesariamente restrictivas o ambiguas.
-
-También se propone ofrecer opciones de estilo tanto para el contenido del audio como para el diseño del documento final. Para reducir consumo de tokens y mantener consistencia visual, se contempla el uso de formatos predefinidos mediante plantillas HTML o CSS.
+- **users** — Profiles, balances, preferences
+- **audio_transactions** — Metadata for each processed audio
+- **credit_movements** — Credit purchases, consumption, and adjustments
+- **payments** — Payment records linked to credit purchases
+- **format_templates** — Predefined and custom document templates
+- **tokens** — API token usage tracking
