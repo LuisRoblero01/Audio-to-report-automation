@@ -1,31 +1,46 @@
-El flujo de la automatización es la siguiente:
-1. Un bot en Telegram recibe un archivo de audio.
-2. Se hace una estimación del precio en base a la duración del archivo de audio (medido en minutos).
-3. Una vez confirmado el pago y el crédito disponible, se comienza a procesar el audio dado.
-4. Se utiliza la API de ChatGPT para convertir el audio a texto.
-5. Se utiliza la API de ChatGPT para ordenar el texto a un formato de salida deseado por el usuario.
-6. Se regresa el archivo en PDF o Word con la información analizada.
+Audio to Report Automation — High-Level Flow
 
-Funciones de la automatización:
-1. Se usa un sistema de pago por minutos en forma de créditos, de la forma:
+1. USER INPUT
+   - User sends an audio file or voice message via Telegram
+   - System extracts metadata: duration, format, file size
 
-         60 minutos -> $29 pesos
-        120 minutos -> $59 pesos
-        180 minutos -> $79 pesos
+2. COST ESTIMATION
+   - Duration is evaluated against a credit-based pricing model
+   - User is notified of the estimated cost in credits
 
-2. Se usa MercadoPago como método de pago.
-3. Se presentan opciones de 'estilo' del audio que el usuario da, asi como el 'estilo' de diseño de sal
-4. Se usan formatos preestablecidos en formato HTML o CSS para ahorrar en tokens de API.
+3. CREDIT VALIDATION
+   - System checks if the user has sufficient credits
+   - If insufficient, user is prompted to purchase a credit package
+   - Payment is processed through a third-party payment gateway
 
-Flujo de la carga de trabajo:
-1. Se analiza el peso y duracion del archivo de audio que manden al bot.
-2. Se porpone no usar límites de duracion como diferenciador a la competencia gratis.
-3. Se propone usar un sistema de condicionantes en cuanto al funcionamiento del algoritmo que analizará el audio:
+4. AUDIO PROCESSING
+   - Audio is sent to a speech-to-text API for transcription
+   - The raw transcript is then processed by an AI model
 
-         duración < 20 minutos                   -> Pasa directo
-         90 minutos > duración > 20 minutos      -> Chunking
-         duración > 90 minutos                   -> Procesado especial
+5. FORMAT SELECTION
+   - User chooses an output format:
+     - Quick summary
+     - Detailed notes
+     - Meeting minutes
+     - Conference analysis
+     - Study notes
+   - Custom formats can also be defined via HTML/CSS templates
 
-4. Se proponen mensajes 'positivos' para el usuario, evitando negativismos.
-5. 
-    
+6. DOCUMENT GENERATION
+   - The structured content is injected into a document template
+   - A PDF or Word file is generated
+
+7. DELIVERY
+   - The final document is sent back to the user via Telegram
+
+ADDITIONAL FEATURES
+   - Dynamic inline menus for navigation
+   - Credit history and balance tracking
+   - Custom format creator (upload your own templates)
+   - Processing history
+   - Observability and tracing for performance monitoring
+
+PROCESSING STRATEGY
+   - Short audio (<20 min): Direct processing
+   - Medium audio (20-90 min): Chunked processing
+   - Long audio (>90 min): Specialized processing pipeline
