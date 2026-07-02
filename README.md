@@ -29,9 +29,10 @@ Converts unstructured audio content — classes, meetings, conferences, voice no
 
 ```
 ├── docs/
-│   ├── vision_producto.md    # Product vision & business model
-│   └── arquitectura.md       # System architecture
-└── structure_flow           # High-level flow description
+│   ├── vision_producto.md      # Product vision & business model
+│   ├── arquitectura.md         # System architecture
+│   └── how_the_flow_works.md   # Friendly walkthrough of the n8n flow
+└── structure_flow             # High-level flow description
 ```
 
 ## Note
